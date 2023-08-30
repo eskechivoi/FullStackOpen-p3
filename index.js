@@ -1,7 +1,13 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
+morgan.token('body', function getBody (req) {
+    return JSON.stringify(req.body)
+})
+
 app.use(express.json())
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 const generateId = () => {
     let id = 0
@@ -60,13 +66,13 @@ app.post('/api/persons', (request, response) => {
     let id = generateId()
     const body = request.body
     if(!body.name || !body.number){
-        return response.status(204).end({
+        return response.status(204).end(JSON.stringify({
             error: "You must append a name and a number."
-        })
+        }))
     } else if (persons.filter(person => person.name === body.name)) {
-        return response.status(204).end({
+        return response.status(204).end(JSON.stringify({
             error: "Name is already on the phonebook."
-        })
+        }))
     } else {
         const newPerson = {
             "id": id,
