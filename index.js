@@ -9,7 +9,7 @@ const generateId = () => {
         min = Math.ceil(0);
         max = Math.floor(1000000);
         id = Math.floor(Math.random() * (max - min) + min);
-    } while (persons.filter(person => person.id === id))
+    } while (persons.filter(person => person.id === id).length > 0)
     console.log(id)
     return id
 }
@@ -63,13 +63,17 @@ app.post('/api/persons', (request, response) => {
         return response.status(204).end({
             error: "You must append a name and a number."
         })
+    } else if (persons.filter(person => person.name === body.name)) {
+        return response.status(204).end({
+            error: "Name is already on the phonebook."
+        })
     } else {
         const newPerson = {
             "id": id,
             "name": body.name,
             "number": body.number
         }
-        persons = persons.concat(body)
+        persons = persons.concat(newPerson)
         response.status(200).send(`Created new person with id ${id}`)
     }
 })
